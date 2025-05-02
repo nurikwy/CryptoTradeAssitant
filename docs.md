@@ -281,3 +281,38 @@ _Bot displays these metrics in a formatted card. Users interpret on-chain data m
   2. Manager subscribes to master’s on-chain events  
   3. New master order → get subscriber settings → place matched orders  
 
+## 7. Polkadot Integration Research
+
+- **Consensus & RPC**  
+  - Polkadot nodes expose a JSON-RPC interface (e.g. `chain_getBlock`, `author_submitExtrinsic`) over HTTP and WebSocket  
+  - We will use the Python Substrate Interface library to simplify RPC calls and event subscriptions
+
+- **Key Management & Signing**  
+  - Integrate Parity Signer (Polkadot Vault) for offline key storage and QR-based transaction signing  
+  - Implement a QR code workflow: encode unsigned extrinsic → sign in Vault → decode signed payload → submit via RPC
+
+- **Cross-Consensus Messaging (XCM)**  
+  - XCM v2 serves as the standard format for sending instructions and assets between Relay Chain and parachains  
+  - Use HRMP channels for development/testing and mature to XCMP for production messaging
+
+- **Asset Bridges & Token Standards**  
+  - Leverage ORML’s `xtokens` pallet to perform XC-20 style cross-chain transfers via XCM  
+  - Support lock-mint and burn-release workflows to move assets between Solana and Polkadot
+
+- **DEX Patterns on Polkadot**  
+  - Integrate AMM functionality from parachains like HydraDX and Polkadex via Substrate swap pallets  
+  - Support orderbook models (e.g. Polkaswap) by subscribing to on-chain events for limit/market order confirmations
+
+### Plan of Action
+
+1. **Extend Wallet Flow**  
+   - Add Substrate keypair generation and encryption to the existing Telegram wallet-link process  
+2. **Build RPC Client**  
+   - Implement an async WebSocket client using the Python Substrate Interface to handle Polkadot JSON-RPC  
+3. **Develop XCM Module**  
+   - Create an async wrapper for `teleport_assets` and `reserve_transfer_assets` extrinsics via ORML `xtokens`  
+4. **Implement DEX Adapter**  
+   - Integrate Substrate swap and orderbook pallets on Plaza for AMM and limit/market orders  
+5. **End-to-End Testing**  
+   - On Rococo testnet: execute cross-chain trade from Solana → XCM bridge → Plaza and confirm via Telegram notifications  
+
